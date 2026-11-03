@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#fff2b8" />
+    <title>DeesMathsGame</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #28334f;
+        --muted: #707c99;
+        --paper: #ffffff;
+        --canvas: #fff5d5;
+        --green: #267c56;
+        --green-dark: #175f40;
+        --mint: #d7f5dd;
+        --yellow: #ffd447;
+        --line: #eee7cb;
+        --coral: #f26b5b;
+        --purple: #7956cf;
+        --shadow: 0 16px 42px rgba(69, 78, 114, 0.11);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        min-height: 100vh;
+        background:
+          radial-gradient(ellipse at 10% 12%, rgba(255, 186, 91, .36), transparent 24rem),
+          radial-gradient(ellipse at 92% 84%, rgba(87, 190, 233, .3), transparent 26rem),
+          var(--canvas);
+        color: var(--ink);
+        font-family: "DM Sans", sans-serif;
+        font-size: 15px;
+      }
+
+      button { color: inherit; font: inherit; }
+      button:focus-visible, a:focus-visible, input:focus-visible {
+        outline: 3px solid #68a98c;
+        outline-offset: 3px;
+      }
+
+      .app { width: min(1100px, calc(100% - 48px)); margin: 0 auto; padding: 24px 0 40px; }
+      .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0; }
+      .brand { display: flex; align-items: center; gap: 11px; }
+      .brand-mark { display: grid; width: 47px; height: 47px; place-items: center; border-radius: 16px; background: #ffd955; font-size: 27px; }
+      .brand-name { color: #303e76; font: 600 22px "Fredoka", sans-serif; letter-spacing: -.3px; }
+      .brand-caption { margin-top: 1px; color: #6a789c; font-size: 11px; }
+      .top-actions { display: flex; align-items: center; gap: 12px; }
+      .streak-pill { display: flex; align-items: center; gap: 7px; padding: 10px 14px; border: 1px solid #ffe28c; border-radius: 99px; background: #fff; font-weight: 700; font-size: 13px; }
+      .sound-button { display: grid; width: 40px; height: 40px; place-items: center; border: 1px solid #ded5f8; border-radius: 50%; background: #fff; cursor: pointer; font-size: 16px; }
+
+      h1, h2, p { margin-top: 0; }
+
+      .layout { display: grid; width: min(720px, 100%); grid-template-columns: minmax(0, 1fr); align-items: start; gap: 14px; margin: 38px auto 0; }
+      .main-column { display: grid; min-width: 0; }
+      .panel { border: 2px solid rgba(255, 206, 78, .76); border-radius: 25px; background: var(--paper); box-shadow: var(--shadow); }
+
+      .practice { padding: 22px 25px 24px; }
+      .practice-header { display: grid; justify-items: center; gap: 9px; }
+      .practice-label { margin: 0; color: #303e76; font: 600 26px "Fredoka", sans-serif; letter-spacing: -.2px; text-transform: none; }
+      .sound-toggle { padding: 6px 12px; border: 1px solid #ffd678; border-radius: 99px; background: #fff6cf; color: #835800; font-size: 11px; font-weight: 700; cursor: pointer; }
+      .operation-tabs { display: flex; gap: 8px; margin: 19px 0 18px; }
+      .operation-tab { flex: 1; display: flex; justify-content: center; align-items: center; gap: 7px; min-height: 48px; padding: 8px 9px; border: 2px solid #ecebfa; border-radius: 14px; background: #fff; color: #525d7e; cursor: pointer; font-size: 12px; font-weight: 700; transition: .18s ease; }
+      .operation-tab:hover { transform: translateY(-1px); border-color: #cddfcf; }
+      .operation-tab[data-operation="add"][aria-pressed="true"] { border-color: #54bf83; background: #dff8e5; color: #186c43; }
+      .operation-tab[data-operation="subtract"][aria-pressed="true"] { border-color: #ff9a68; background: #fff0dc; color: #ad4b2f; }
+      .operation-tab[data-operation="multiply"][aria-pressed="true"] { border-color: #a383f1; background: #f0e9ff; color: #6042b3; }
+      .operation-tab[data-operation="divide"][aria-pressed="true"] { border-color: #53bde0; background: #e1f6ff; color: #216788; }
+      .tab-symbol { font: 600 19px "Fredoka", sans-serif; }
+
+      .question-area { position: relative; min-height: 263px; padding: 20px 14px 12px; overflow: hidden; border: 2px solid #bce7f3; border-radius: 18px; background: linear-gradient(180deg, #effaff 0%, #f5fff3 100%); text-align: center; }
+      .question-decoration { position: absolute; top: 9px; right: 14px; font-size: 20px; opacity: .6; }
+      .question-decoration.left { top: auto; right: auto; bottom: 11px; left: 13px; font-size: 17px; }
+      .question-story { margin: 0 0 8px; color: #536884; font-size: 13px; }
+      .equation { color: #28334f; font: 600 42px "Fredoka", sans-serif; letter-spacing: 1px; }
+      .equation .operator { padding: 0 5px; color: var(--coral); }
+      .equation .equals { color: #abb3a8; }
+      .question-visual { display: flex; justify-content: center; align-items: center; min-height: 59px; gap: 10px; margin: 5px auto 4px; }
+      .visual-group { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; max-width: 205px; gap: 3px; font-size: 20px; line-height: 1.15; }
+      .visual-group.equal-groups { align-items: flex-start; gap: 6px; }
+      .mini-group { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; width: 51px; min-height: 37px; padding: 4px; border: 1px solid #ffc978; border-radius: 10px; background: #fff9e8; font-size: 16px; line-height: 1.2; }
+      .visual-symbol { color: #b1b8aa; font: 500 17px "Fredoka", sans-serif; }
+      .question-hint { margin: 4px 0 0; color: #536884; font-size: 12px; }
+      .answer-row { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
+      .answer-button { min-width: 83px; min-height: 49px; padding: 8px 18px; border: 2px solid #ffdc72; border-radius: 15px; background: #fff; color: var(--ink); cursor: pointer; font: 600 23px "Fredoka", sans-serif; transition: transform .15s, background .15s, border-color .15s; }
+      .answer-button:hover:not(:disabled) { transform: translateY(-2px); border-color: #64c886; background: #eaffee; }
+      .answer-button:disabled { cursor: default; opacity: .66; }
+      .answer-button.is-correct { border-color: #43b977; background: #dff8e5; color: #186c43; opacity: 1; }
+      .answer-button.is-wrong { border-color: #f28a77; background: #fff0e8; color: #ac4737; }
+      .feedback { min-height: 25px; padding-top: 11px; color: #247b48; font-size: 13px; font-weight: 700; }
+      .feedback.is-wrong { color: #ac4737; }
+      .question-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; padding-top: 13px; border-top: 1px solid #e4eef0; }
+      .helper-button { display: inline-flex; align-items: center; gap: 6px; padding: 7px 0; border: 0; background: transparent; color: #576b88; cursor: pointer; font-size: 12px; font-weight: 700; }
+      .next-button { min-height: 43px; padding: 9px 17px; border: 0; border-radius: 14px; background: #208857; color: white; cursor: pointer; font-size: 13px; font-weight: 800; transition: background .15s, transform .15s; }
+      .next-button:hover { transform: translateY(-1px); background: var(--green-dark); }
+      .next-button:disabled { cursor: default; opacity: .43; transform: none; }
+
+      .side-column { display: grid; }
+      .mini-card { display: grid; grid-template-columns: 1fr 1.4fr; align-items: center; gap: 0 24px; padding: 15px 20px; border-color: #ffd65a; background: linear-gradient(160deg, #fff 30%, #fff6cf 100%); }
+      .mini-heading { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+      .mini-heading h2 { margin: 0; color: #303e76; font: 500 19px "Fredoka", sans-serif; }
+      .mini-heading span { color: #bd7c00; font-size: 9px; font-weight: 800; }
+      .stars-summary { display: flex; align-items: center; gap: 10px; }
+      .star-badge { display: grid; width: 43px; height: 43px; place-items: center; border-radius: 14px; background: #ffe580; font-size: 22px; }
+      .star-count { color: #29385f; font: 600 24px "Fredoka", sans-serif; }
+      .star-caption { color: var(--muted); font-size: 10px; }
+      .facts-row { display: flex; justify-content: space-around; gap: 8px; padding: 0; border-top: 0; }
+      .fact { min-width: 0; text-align: center; }
+      .fact-number { color: #374c75; font: 600 20px "Fredoka", sans-serif; }
+      .fact-label { margin-top: 2px; color: var(--muted); font-size: 9px; }
+      @media (max-width: 820px) {
+        .app { width: min(720px, calc(100% - 36px)); padding-top: 20px; }
+        .layout { margin-top: 30px; }
+      }
+      @media (max-width: 520px) {
+        .app { width: calc(100% - 26px); padding-top: 15px; }
+        .brand-name { font-size: 18px; }
+        .brand-caption { font-size: 10px; }
+        .brand-mark { width: 39px; height: 39px; font-size: 22px; }
+        .top-actions { gap: 7px; }
+        .streak-pill { padding: 8px 10px; font-size: 11px; }
+        .sound-button { width: 36px; height: 36px; }
+        .layout { gap: 12px; margin-top: 23px; }
+        .panel { border-radius: 18px; }
+        .mini-card { grid-template-columns: 1fr; gap: 0; padding: 16px; }
+        .stars-summary { margin-bottom: 12px; }
+        .facts-row { padding-top: 12px; border-top: 1px solid #f3e7ba; }
+        .practice { padding: 18px 14px 15px; }
+        .practice-label { font-size: 24px; }
+        .operation-tabs { gap: 5px; margin: 15px 0; }
+        .operation-tab { min-height: 43px; gap: 4px; padding: 7px 4px; font-size: 10px; }
+        .tab-symbol { font-size: 15px; }
+        .question-area { min-height: 253px; padding-right: 8px; padding-left: 8px; }
+        .equation { font-size: 34px; }
+        .answer-button { min-width: 72px; min-height: 43px; padding: 7px 12px; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">🌈</div>
+          <div>
+            <div class="brand-name">DeesMathsGame</div>
+            <div class="brand-caption">Maths made bright and fun!</div>
+          </div>
+        </div>
+        <div class="top-actions">
+          <div class="streak-pill" aria-live="polite"><span aria-hidden="true">🔥</span> <span id="streak-count">0</span> in a row</div>
+          <button class="sound-button" id="sound-button" type="button" aria-label="Turn sound on" title="Turn sound on">🔇</button>
+        </div>
+      </header>
+
+      <div class="layout">
+        <section class="main-column" aria-label="Math adventure">
+          <section class="panel practice" aria-labelledby="practice-title">
+            <div class="practice-header">
+              <h1 class="practice-label" id="practice-title">A little practice</h1>
+              <button class="sound-toggle" id="hint-toggle" type="button" aria-expanded="true">💡 Show hint</button>
+            </div>
+            <div class="operation-tabs" role="group" aria-label="Choose a kind of math">
+              <button class="operation-tab" data-operation="add" type="button" aria-pressed="true"><span class="tab-symbol" aria-hidden="true">+</span> Add</button>
+              <button class="operation-tab" data-operation="subtract" type="button" aria-pressed="false"><span class="tab-symbol" aria-hidden="true">−</span> Take away</button>
+              <button class="operation-tab" data-operation="multiply" type="button" aria-pressed="false"><span class="tab-symbol" aria-hidden="true">×</span> Groups</button>
+              <button class="operation-tab" data-operation="divide" type="button" aria-pressed="false"><span class="tab-symbol" aria-hidden="true">÷</span> Share</button>
+            </div>
+
+            <div class="question-area" aria-live="polite">
+              <span class="question-decoration" aria-hidden="true">✦</span>
+              <span class="question-decoration left" aria-hidden="true">✿</span>
+              <p class="question-story" id="question-story">The garden has 2 apples. You pick 3 more!</p>
+              <div class="equation" id="equation" aria-label="2 plus 3 equals what?">
+                <span>2</span> <span class="operator">+</span> <span>3</span> <span class="equals">= ?</span>
+              </div>
+              <div class="question-visual" id="question-visual" aria-hidden="true"></div>
+              <p class="question-hint" id="question-hint">Count on from 2: 3... 4, 5!</p>
+              <div class="answer-row" id="answer-row" role="group" aria-label="Choose your answer"></div>
+              <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+            </div>
+
+            <div class="question-footer">
+              <button class="helper-button" id="help-button" type="button"><span aria-hidden="true">🌟</span> I need a little help</button>
+              <button class="next-button" id="next-button" type="button" disabled>Next puzzle <span aria-hidden="true">→</span></button>
+            </div>
+          </section>
+        </section>
+
+        <aside class="side-column" aria-label="Your treasures">
+          <section class="panel mini-card" aria-labelledby="stars-title">
+            <div class="mini-heading"><h2 id="stars-title">Your Treasures</h2><span>KEEP IT UP!</span></div>
+            <div class="stars-summary">
+              <div class="star-badge" aria-hidden="true">⭐</div>
+              <div><div class="star-count" id="stars-count">0</div><div class="star-caption">happy stars collected</div></div>
+            </div>
+            <div class="facts-row">
+              <div class="fact"><div class="fact-number" id="solved-count">0</div><div class="fact-label">puzzles solved</div></div>
+              <div class="fact"><div class="fact-number" id="best-streak">0</div><div class="fact-label">best streak</div></div>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </main>
+    <script src="game.js"></script>
+  </body>
+</html>
