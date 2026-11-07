@@ -53,8 +53,8 @@
     feedback: document.getElementById("feedback"),
     next: document.getElementById("next-button"),
     help: document.getElementById("help-button"),
-    stars: document.getElementById("stars-count"),
-    solved: document.getElementById("solved-count"),
+    attempted: document.getElementById("attempted-count"),
+    firstTry: document.getElementById("first-try-count"),
     streak: document.getElementById("streak-count"),
     bestStreak: document.getElementById("best-streak"),
     sound: document.getElementById("sound-button"),
@@ -62,7 +62,8 @@
 
   const freshState = () => ({
     stars: 0,
-    solved: 0,
+    attempted: 0,
+    firstTryCorrect: 0,
     streak: 0,
     bestStreak: 0,
   });
@@ -79,7 +80,7 @@
       const saved = JSON.parse(localStorage.getItem(SAVE_KEY));
       if (!saved || typeof saved !== "object") return freshState();
       const clean = freshState();
-      for (const key of ["stars", "solved", "streak", "bestStreak"]) {
+      for (const key of ["stars", "attempted", "firstTryCorrect", "streak", "bestStreak"]) {
         if (Number.isSafeInteger(saved[key]) && saved[key] >= 0) clean[key] = saved[key];
       }
       return clean;
@@ -274,11 +275,13 @@
 
   function checkAnswer(value, selectedButton) {
     if (question.complete) return;
+    const firstAttempt = question.wrongAttempts === 0;
+    if (firstAttempt) state.attempted++;
     if (value === question.answer) {
       question.complete = true;
       const previousLevel = level();
       state.stars++;
-      state.solved++;
+      if (firstAttempt) state.firstTryCorrect++;
       state.streak++;
       state.bestStreak = Math.max(state.bestStreak, state.streak);
       saveState();
@@ -321,8 +324,8 @@
   }
 
   function updateProgress() {
-    elements.stars.textContent = String(state.stars);
-    elements.solved.textContent = String(state.solved);
+    elements.attempted.textContent = String(state.attempted);
+    elements.firstTry.textContent = String(state.firstTryCorrect);
     elements.streak.textContent = String(state.streak);
     elements.bestStreak.textContent = String(state.bestStreak);
   }
