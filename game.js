@@ -214,7 +214,6 @@
     elements.hintToggle.setAttribute("aria-expanded", String(hintVisible));
     elements.feedback.textContent = "";
     elements.feedback.className = "feedback";
-    elements.next.disabled = true;
     elements.answerRow.replaceChildren();
     makeChoices(question.answer).forEach((choice) => {
       const button = document.createElement("button");
@@ -295,7 +294,6 @@
       elements.feedback.textContent = newLevel > previousLevel
         ? "Level up! The puzzles are getting trickier. You've got this! 🎉"
         : praise[Math.floor(Math.random() * praise.length)];
-      elements.next.disabled = false;
       elements.next.focus({ preventScroll: true });
       playNote(true);
     } else {
@@ -309,7 +307,6 @@
         question.complete = true;
         elements.feedback.textContent = `The answer is ${question.answer}. Let's try a new one together!`;
         elements.answerRow.querySelectorAll("button").forEach((button) => { button.disabled = true; });
-        elements.next.disabled = false;
       } else {
         elements.feedback.textContent = retryMessages[Math.floor(Math.random() * retryMessages.length)];
         elements.hint.hidden = false;
